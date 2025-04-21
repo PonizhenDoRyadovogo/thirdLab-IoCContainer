@@ -12,7 +12,7 @@ int main(int argc, const char *argv[])
     IOCContainer injector;
 
     // 1-й способ использования
-    std::cout << "=====1 example=====" << std::endl;
+    std::cout << "===== 1 example =====" << std::endl;
     injector.RegisterInstance<double>(std::make_shared<double>(3.2));
     injector.RegisterInstance<ProcessorType>(std::make_shared<ProcessorType>(x64));
     injector.RegisterInstance<std::string>(std::make_shared<std::string>("v1.2"));
@@ -51,7 +51,7 @@ int main(int argc, const char *argv[])
     pc1->configure();
 
     // 2-й способ использвания
-    std::cout << "===== 2 example=====" << std::endl;
+    std::cout << "===== 2 example =====" << std::endl;
     injector.RegisterInstance<IProcessor>(std::make_shared<IntelProcessor>(4.4, ProcessorType::x64, "v3.1"));
     Computer pc2(injector.GetObject<IProcessor>());
     pc2.configure();
@@ -61,7 +61,7 @@ int main(int argc, const char *argv[])
     pc2.configure();
 
     // 3-й способ использования
-    std::cout << "===== 3 example=====" << std::endl;
+    std::cout << "===== 3 example =====" << std::endl;
     injector.RegisterFactory<IProcessor, IntelProcessor, double, ProcessorType, std::string>();
     Computer pc3(injector.GetObject<IProcessor>());
     pc3.configure();
