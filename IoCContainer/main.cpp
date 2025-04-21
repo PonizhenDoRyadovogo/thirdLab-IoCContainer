@@ -60,6 +60,11 @@ int main(int argc, const char *argv[])
     pc2.setProcessor(injector);
     pc2.configure();
 
+    // 3-й способ использования
+    std::cout << "===== 3 example=====" << std::endl;
+    injector.RegisterFactory<IProcessor, IntelProcessor, double, ProcessorType, std::string>();
+    Computer pc3(injector.GetObject<IProcessor>());
+    pc3.configure();
 
     return 0;
 }

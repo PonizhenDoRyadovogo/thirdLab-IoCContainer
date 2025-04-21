@@ -29,6 +29,9 @@ public:
     IntelProcessor(double speed, const ProcessorType& type, const std::string& version)
         :m_speed(speed), m_type(type), m_version(version)
     {}
+    IntelProcessor(std::shared_ptr<double> speedPtr, std::shared_ptr<ProcessorType> typePtr, std::shared_ptr<std::string> versionPtr)
+        :m_speed(*speedPtr), m_type(*typePtr), m_version(*versionPtr)
+    {}
     std::string getProcessorInfo() const override
     {
         return "Intel processor for: " + std::to_string(m_speed) + ", " + m_version + ", " + PROCESSOR_TYPE[m_type];
@@ -45,7 +48,9 @@ public:
     AmdProcessor(double speed, const ProcessorType& type, const std::string& version)
         :m_speed(speed), m_type(type), m_version(version)
     {}
-
+    AmdProcessor(std::shared_ptr<double> speedPtr, std::shared_ptr<ProcessorType> typePtr, std::shared_ptr<std::string> versionPtr)
+        :m_speed(*speedPtr), m_type(*typePtr), m_version(*versionPtr)
+    {}
     std::string getProcessorInfo() const override
     {
         return "AMD processor for: " + std::to_string(m_speed) + ", " + m_version + ", " + PROCESSOR_TYPE[m_type];
