@@ -1,4 +1,6 @@
 #include "IoCContainer.h"
+#include "Example.h"
+#include "Computer.h"
 
 IOCContainer gContainer;
 
@@ -7,30 +9,41 @@ int IOCContainer::s_nextTypeId = 115094801;
 
 int main(int argc, const char *argv[])
 {
-    //------Example #1----------------
-    //Injector injector;
     IOCContainer injector;
 
-    // Регистрируем IHello с классом Hello, т.о. каждый раз запрашивая IHell получаем объект Hello.
-    injector.RegisterInstance<IHello, Hello>();
-    auto helloInstance = injector.GetObject<IHello>();
-    helloInstance->hello();
-    injector.RegisterInstance<IHello, Privet>();
+    // 1-й способ использования
+    injector.RegisterInstance<double>(std::make_shared<double>(3.2));
+    injector.RegisterInstance<ProcessorType>(std::make_shared<ProcessorType>(x64));
+    injector.RegisterInstance<std::string>(std::make_shared<std::string>("v1.2"));
+    injector.RegisterFunctor<IProcessor, double, ProcessorType, std::string>(
+        std::function<std::shared_ptr<IProcessor>(std::shared_ptr<double>,
+        std::shared_ptr<ProcessorType>,
+        std::shared_ptr<std::string>)>([] (std::shared_ptr<double> speed,
+                                           std::shared_ptr<ProcessorType> type,
+                                           std::shared_ptr<std::string> version)->std::shared_ptr<IProcessor>
+                                           {
+                                               return std::make_shared<IntelProcessor>(*speed, *type, *version);
+                                           }));
 
-    //Здесь, после регистрации получим объект Privet
-    helloInstance = injector.GetObject<IHello>();
-    helloInstance->hello();
+    injector.RegisterFactory<Computer, Computer, IProcessor>();
 
-    //------Example #2----------------
+    auto pc1 = injector.GetObject<Computer>();
+    pc1->configure();
 
-    gContainer.RegisterInstance<IAmAThing, TheThing>();
-    gContainer.RegisterFactory<IAmTheOtherThing, TheOtherThing, IAmAThing>();
+    injector.RegisterFunctor<IProcessor, double, ProcessorType, std::string>(
+        std::function<std::shared_ptr<IProcessor>(std::shared_ptr<double>,
+        std::shared_ptr<ProcessorType>,
+        std::shared_ptr<std::string>)>([] (std::shared_ptr<double> speed,
+                                          std::shared_ptr<ProcessorType> type,
+                                          std::shared_ptr<std::string> version)->std::shared_ptr<IProcessor>
+                                            {
+                                                return std::make_shared<AmdProcessor>(*speed, *type, *version);
+                                            }));
+    pc1->setProcessor(injector);
+    pc1->configure();
 
-    gContainer.GetObject<IAmAThing>()->TestThis();
-    gContainer.GetObject<IAmTheOtherThing>()->TheOtherTest();
+    // 2-й способ использвания
 
-    //Опять запршиваем объект,после последней регистрации получим объект Privet
-    helloInstance = injector.GetObject<IHello>();
-    helloInstance->hello();
+
     return 0;
 }
