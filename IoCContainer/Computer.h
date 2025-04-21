@@ -26,7 +26,7 @@ const std::string IProcessor::PROCESSOR_TYPE[] = {"x86", "x64"};
 
 class IntelProcessor : public IProcessor {
 public:
-    IntelProcessor(double speed, ProcessorType& type, const std::string& version)
+    IntelProcessor(double speed, const ProcessorType& type, const std::string& version)
         :m_speed(speed), m_type(type), m_version(version)
     {}
     std::string getProcessorInfo() const override
@@ -42,7 +42,7 @@ private:
 
 class AmdProcessor : public IProcessor {
 public:
-    AmdProcessor(double speed, ProcessorType& type, const std::string& version)
+    AmdProcessor(double speed, const ProcessorType& type, const std::string& version)
         :m_speed(speed), m_type(type), m_version(version)
     {}
 
@@ -58,6 +58,7 @@ private:
 
 class Computer {
 public:
+    Computer() = default;
     Computer(std::shared_ptr<IProcessor> p)
         : m_processor(p)
     {}

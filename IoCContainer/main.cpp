@@ -12,6 +12,7 @@ int main(int argc, const char *argv[])
     IOCContainer injector;
 
     // 1-й способ использования
+    std::cout << "=====1 example=====" << std::endl;
     injector.RegisterInstance<double>(std::make_shared<double>(3.2));
     injector.RegisterInstance<ProcessorType>(std::make_shared<ProcessorType>(x64));
     injector.RegisterInstance<std::string>(std::make_shared<std::string>("v1.2"));
@@ -42,7 +43,22 @@ int main(int argc, const char *argv[])
     pc1->setProcessor(injector);
     pc1->configure();
 
+    // сменим параметры процессора
+    injector.RegisterInstance<double>(std::make_shared<double>(2.5));
+    injector.RegisterInstance<ProcessorType>(std::make_shared<ProcessorType>(x86));
+    injector.RegisterInstance<std::string>(std::make_shared<std::string>("v2.5"));
+    pc1->setProcessor(injector);
+    pc1->configure();
+
     // 2-й способ использвания
+    std::cout << "===== 2 example=====" << std::endl;
+    injector.RegisterInstance<IProcessor>(std::make_shared<IntelProcessor>(4.4, ProcessorType::x64, "v3.1"));
+    Computer pc2(injector.GetObject<IProcessor>());
+    pc2.configure();
+
+    injector.RegisterInstance<IProcessor>(std::make_shared<AmdProcessor>(2.5, ProcessorType::x86, "v3.1"));
+    pc2.setProcessor(injector);
+    pc2.configure();
 
 
     return 0;
