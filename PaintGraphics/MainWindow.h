@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QComboBox>
 #include <QPushButton>
-#include <memory>
 #include <QCheckBox>
 
 class MainWindow : public QMainWindow
@@ -15,12 +14,12 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 private:
-    std::unique_ptr<QComboBox> _createComboBoxCharts();
-    std::unique_ptr<QComboBox> _createComboBoxStyle();
+    QComboBox* _createComboBoxCharts() const;
+    QComboBox* _createComboBoxStyle() const;
 private:
-    std::unique_ptr<QComboBox> m_comboBoxCharts;
-    std::unique_ptr<QPushButton> m_pushButtonSave;
-    std::unique_ptr<QCheckBox> m_checkBoxBlackAndWhite;
-    std::unique_ptr<QComboBox> m_comboBoxWindowStyle;
+    QComboBox* m_comboBoxCharts = nullptr;
+    QPushButton* m_pushButtonSave = nullptr;
+    QCheckBox* m_checkBoxBlackAndWhite = nullptr;
+    QComboBox* m_comboBoxWindowStyle = nullptr;
 };
 #endif // MAINWINDOW_H
