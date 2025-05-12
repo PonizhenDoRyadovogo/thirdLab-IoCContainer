@@ -21,13 +21,22 @@ MainWindow::MainWindow(QWidget *parent)
     m_checkBoxBlackAndWhite = new QCheckBox("Black and white", central);
     // Инициализация кнопки для открытия папки
     m_pushButtonFolder = new QPushButton("Open folder", central);
-    // Создание лэйаута для компоновки настроек
+    // Создание лэйаутов для компоновки настроек
     QHBoxLayout* settingsLayout = new QHBoxLayout();
+    QHBoxLayout* chartsLayout = new QHBoxLayout(); // эти два лэйаута необходимы для того, чтобы
+    // надписи "прилипали" к своим комбо-боксам
+    QHBoxLayout* styleLayout = new QHBoxLayout();
+    styleLayout->setContentsMargins(0,0,0,0);
+    styleLayout->setSpacing(5);
+    chartsLayout->setSpacing(5);
+    chartsLayout->setContentsMargins(0, 0, 0, 0);
     settingsLayout->addWidget(m_pushButtonFolder);
-    settingsLayout->addWidget(labelCharts);
-    settingsLayout->addWidget(m_comboBoxCharts);
-    settingsLayout->addWidget(labelStyleWin);
-    settingsLayout->addWidget(m_comboBoxWindowStyle);
+    chartsLayout->addWidget(labelCharts, 0);
+    chartsLayout->addWidget(m_comboBoxCharts, 1);
+    styleLayout->addWidget(labelStyleWin, 0);
+    styleLayout->addWidget(m_comboBoxWindowStyle, 1);
+    settingsLayout->addLayout(styleLayout);
+    settingsLayout->addLayout(chartsLayout);
     settingsLayout->addWidget(m_checkBoxBlackAndWhite);
     settingsLayout->addWidget(m_pushButtonSave);
     // Создание области отображения файлов и области отображения графиков, между ними сплиттер
