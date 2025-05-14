@@ -10,5 +10,5 @@ DataModel SqlReader::read(const QString& path)
 
 QString SqlReader::get() const
 {
-    return "sql";
+    return "sqlite";
 }

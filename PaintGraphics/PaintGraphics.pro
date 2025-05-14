@@ -9,17 +9,24 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    BarChartRender.cpp \
     JsonReader.cpp \
+    PieChartRender.cpp \
     SqlReader.cpp \
     main.cpp \
     MainWindow.cpp
 
 HEADERS += \
+    BarChartRender.h \
+    ChartFactory.h \
     DataModel.h \
+    IChartRender.h \
     IDataReader.h \
     IocContainer.h \
     JsonReader.h \
     MainWindow.h \
+    PieChartRender.h \
+    ReaderFactory.h \
     SqlReader.h
 
 # Default rules for deployment.

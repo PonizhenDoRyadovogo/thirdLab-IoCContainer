@@ -8,13 +8,17 @@
 #include <QFileSystemModel>
 #include <QListView>
 #include <QtCharts>
+#include <memory>
+
+#include "ChartFactory.h"
+#include "ReaderFactory.h"
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<ReaderFactory> reader, QWidget *parent = nullptr);
     ~MainWindow();
 private:
     QComboBox* _createComboBoxCharts() const;
@@ -28,5 +32,8 @@ private:
     QFileSystemModel* m_fileExplorer = nullptr;
     QListView* m_listView = nullptr;
     QtCharts::QChartView* m_chartView = nullptr;
+    std::shared_ptr<ReaderFactory> m_readerFactory;
+    std::shared_ptr<ChartFactory> m_chartFactory;
+    DataModel m_currentData;
 };
 #endif // MAINWINDOW_H

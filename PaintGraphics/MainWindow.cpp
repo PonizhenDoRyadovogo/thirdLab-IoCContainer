@@ -5,10 +5,12 @@
 
 #include "MainWindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<ReaderFactory> reader, QWidget *parent)
     : QMainWindow(parent)
     , m_comboBoxCharts(_createComboBoxCharts())
     , m_comboBoxWindowStyle(_createComboBoxStyle())
+    , m_readerFactory(std::move(reader))
+    , m_chartFactory(std::move(chart))
 {
     setWindowTitle("Charts print");
     // Создание центрального виджета
@@ -62,20 +64,53 @@ MainWindow::MainWindow(QWidget *parent)
     m_listView->setModel(m_fileExplorer);
     m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
     // сигналы
+    // сигнал открытия папки по нажатию на кнопку "Open folder"
     connect(m_pushButtonFolder, &QPushButton::clicked, this, [this](){
         QString dir = QFileDialog::getExistingDirectory(this,"Choose folder");
-        if (dir.isEmpty()) return;
+        if (dir.isEmpty()) {
+            return;
+        }
         m_fileExplorer->setRootPath(dir);
         m_listView->setRootIndex(m_fileExplorer->index(dir));
-
     });
+    // сигнал выбора элемента в списке
+    connect(m_listView, &QListView::clicked, this, [&](const QModelIndex &ix){
+        QString path = m_fileExplorer->filePath(ix);
+        QString ext  = QFileInfo(path).suffix();
+        auto reader = m_readerFactory->getReader(ext);
+        if (!reader) {
+            return;
+        }
+        m_currentData = reader->read(path);
+        auto renderer = m_chartFactory->getRender(
+            static_cast<ChartType>(m_comboBoxCharts->currentIndex())
+            );
+        if (!renderer) {
+            return;
+        }
+        renderer->render(m_currentData, m_chartView);
+    });
+    // сигнал изменения чарта
+    connect(m_comboBoxCharts, &QComboBox::currentTextChanged, this, [this](){
+        if (m_currentData.points.isEmpty()) return;
+
+        // выбираем рендерер по новому индексу
+        ChartType type = static_cast<ChartType>(m_comboBoxCharts->currentIndex());
+        auto renderer = m_chartFactory->getRender(type);
+        if (!renderer) {
+            return;
+        }
+        // перерисовываем график
+        renderer->render(m_currentData, m_chartView);
+    });
+
 }
 
 QComboBox* MainWindow::_createComboBoxCharts() const
 {
     QComboBox* comboBox = new QComboBox();
-    comboBox->addItem("PieCharts");
-    comboBox->addItem("BarCharts");
+    comboBox->addItem("Pie chart");
+    comboBox->addItem("Bar chart");
     return comboBox;
 }
 
