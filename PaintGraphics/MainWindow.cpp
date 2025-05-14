@@ -45,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent)
     QSplitter* splitter = new QSplitter(central);
     splitter->addWidget(m_listView);
     splitter->addWidget(m_chartView);
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
     // Создание вертикального лэйаута
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->addLayout(settingsLayout);
@@ -59,6 +61,14 @@ MainWindow::MainWindow(QWidget *parent)
     m_listView->setRootIndex(m_fileExplorer->index(QDir::homePath()));
     m_listView->setModel(m_fileExplorer);
     m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
+    // сигналы
+    connect(m_pushButtonFolder, &QPushButton::clicked, this, [this](){
+        QString dir = QFileDialog::getExistingDirectory(this,"Choose folder");
+        if (dir.isEmpty()) return;
+        m_fileExplorer->setRootPath(dir);
+        m_listView->setRootIndex(m_fileExplorer->index(dir));
+
+    });
 }
 
 QComboBox* MainWindow::_createComboBoxCharts() const
