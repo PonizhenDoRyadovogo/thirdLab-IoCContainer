@@ -9,12 +9,18 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    JsonReader.cpp \
+    SqlReader.cpp \
     main.cpp \
     MainWindow.cpp
 
 HEADERS += \
+    DataModel.h \
+    IDataReader.h \
     IocContainer.h \
-    MainWindow.h
+    JsonReader.h \
+    MainWindow.h \
+    SqlReader.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

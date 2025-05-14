@@ -1,0 +1,14 @@
+#include "SqlReader.h"
+
+DataModel SqlReader::read(const QString& path)
+{
+    DataModel m;
+    m.points.append({"A", 1.0});
+    m.points.append({"B", 2.5});
+    return m;
+}
+
+QString SqlReader::get() const
+{
+    return "sql";
+}
