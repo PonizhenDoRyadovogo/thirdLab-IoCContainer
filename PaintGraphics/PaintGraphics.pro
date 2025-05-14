@@ -13,6 +13,7 @@ SOURCES += \
     MainWindow.cpp
 
 HEADERS += \
+    IocContainer.h \
     MainWindow.h
 
 # Default rules for deployment.
