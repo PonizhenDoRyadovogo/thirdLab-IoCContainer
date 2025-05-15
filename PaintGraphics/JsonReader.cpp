@@ -10,5 +10,5 @@ DataModel JsonReader::read(const QString& path)
 
 QString JsonReader::get() const
 {
-    return "sql";
+    return "json";
 }

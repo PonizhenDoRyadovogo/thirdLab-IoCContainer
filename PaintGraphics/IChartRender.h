@@ -10,11 +10,14 @@ enum ChartType {
     BarChart
 };
 
+Q_DECLARE_METATYPE(ChartType)
+
 class IChartRender {
 public:
     virtual ~IChartRender() = default;
     virtual ChartType getType() const = 0;
     virtual void render(const DataModel& data, QtCharts::QChartView* view) = 0;
+    virtual QString getNameChart() const = 0;
 };
 
 #endif // ICHARTRENDER_H

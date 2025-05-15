@@ -14,18 +14,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     IOCContainer injector;
+    qRegisterMetaType<ChartType>("ChartType");
     injector.RegisterFactory<JsonReader, JsonReader>();
     injector.RegisterFactory<SqlReader, SqlReader>();
-    injector.RegisterFunctor<ReaderFactory, JsonReader, SqlReader>(
-        std::function<std::shared_ptr<ReaderFactory>(
-            std::shared_ptr<JsonReader>, std::shared_ptr<SqlReader>
-            )>(
-            [](auto jr, auto sr) {
-                return std::make_shared<ReaderFactory>(
-                    QVector<std::shared_ptr<IDataReader>>{ jr, sr }
-                    );
-            }
-            ));
+
     injector.RegisterFactory<PieChartRender, PieChartRender>();
     injector.RegisterFactory<BarChartRender, BarChartRender>();
     injector.RegisterFunctor<ReaderFactory, JsonReader, SqlReader>(
@@ -58,7 +50,7 @@ int main(int argc, char *argv[])
             )
         );
 
-    MainWindow w(injector.GetObjectW<ChartFactory>(), injector.GetObjectW<ReaderFactory>());
+    MainWindow w(injector.GetObject<ChartFactory>(), injector.GetObject<ReaderFactory>());
     w.show();
     return a.exec();
 }

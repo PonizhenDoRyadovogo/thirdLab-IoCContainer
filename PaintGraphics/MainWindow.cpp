@@ -2,17 +2,18 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSplitter>
+#include <QVariant>
 
 #include "MainWindow.h"
 
 MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<ReaderFactory> reader, QWidget *parent)
     : QMainWindow(parent)
-    , m_comboBoxCharts(_createComboBoxCharts())
-    , m_comboBoxWindowStyle(_createComboBoxStyle())
     , m_readerFactory(std::move(reader))
     , m_chartFactory(std::move(chart))
 {
     setWindowTitle("Charts print");
+    m_comboBoxCharts = _createComboBoxCharts();
+    m_comboBoxWindowStyle = _createComboBoxStyle();
     // Создание центрального виджета
     QWidget* central = new QWidget(this);
     // Создание подписей
@@ -58,11 +59,18 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     setCentralWidget(central);
     // Инициализация модели файловой системы
     m_fileExplorer = new QFileSystemModel(this);
-    m_fileExplorer->setFilter(QDir::Files | QDir::NoDotAndDotDot);// покаываем только файлы, но скрываем специальные . ..
+    m_fileExplorer->setFilter(QDir::Files | QDir::NoDotAndDotDot);// показываем только файлы, но скрываем специальные . ..
     m_fileExplorer->setRootPath(QDir::homePath());
     m_listView->setRootIndex(m_fileExplorer->index(QDir::homePath()));
     m_listView->setModel(m_fileExplorer);
     m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
+    // выставляем фильтры для файлов
+    QStringList filters;
+    for(int i = 0; i < m_readerFactory->getExpansions().size(); ++i) {
+        filters << "*." + m_readerFactory->getExpansions()[i];
+    }
+    m_fileExplorer->setNameFilters(filters);
+    m_fileExplorer->setNameFilterDisables(false);
     // сигналы
     // сигнал открытия папки по нажатию на кнопку "Open folder"
     connect(m_pushButtonFolder, &QPushButton::clicked, this, [this](){
@@ -92,10 +100,11 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     });
     // сигнал изменения чарта
     connect(m_comboBoxCharts, &QComboBox::currentTextChanged, this, [this](){
-        if (m_currentData.points.isEmpty()) return;
-
-        // выбираем рендерер по новому индексу
-        ChartType type = static_cast<ChartType>(m_comboBoxCharts->currentIndex());
+        if (m_currentData.points.isEmpty()) {
+            return;
+        }
+        QVariant v = m_comboBoxCharts->currentData();
+        ChartType type = v.value<ChartType>();
         auto renderer = m_chartFactory->getRender(type);
         if (!renderer) {
             return;
@@ -109,8 +118,10 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
 QComboBox* MainWindow::_createComboBoxCharts() const
 {
     QComboBox* comboBox = new QComboBox();
-    comboBox->addItem("Pie chart");
-    comboBox->addItem("Bar chart");
+    QVector<std::shared_ptr<IChartRender>> renderers = m_chartFactory->renderers();
+    for(auto& r: renderers) {
+        comboBox->addItem(r->getNameChart(), QVariant::fromValue(r->getType()));
+    }
     return comboBox;
 }
 

@@ -14,6 +14,9 @@ public:
     std::shared_ptr<IChartRender> getRender(ChartType t) const {
         return m_map.value(t, nullptr);
     }
+    QVector<std::shared_ptr<IChartRender>> renderers() {
+        return m_map.values().toVector();
+    }
 private:
     QHash<ChartType, std::shared_ptr<IChartRender>> m_map;
 };

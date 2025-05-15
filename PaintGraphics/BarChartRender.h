@@ -12,8 +12,11 @@
 class BarChartRender : public IChartRender
 {
 public:
-    virtual ChartType getType() const override;
-    virtual void render(const DataModel& data, QtCharts::QChartView* view) override;
+    ChartType getType() const override;
+    void render(const DataModel& data, QtCharts::QChartView* view) override;
+    QString getNameChart() const override {return m_name;}
+private:
+    QString m_name = "Bar chart";
 };
 
 #endif // BARCHARTRENDER_H

@@ -1,3 +1,5 @@
+#include <QtSql>
+
 #include "SqlReader.h"
 
 DataModel SqlReader::read(const QString& path)
