@@ -91,8 +91,7 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
         }
         m_currentData = reader->read(path);
         auto renderer = m_chartFactory->getRender(
-            static_cast<ChartType>(m_comboBoxCharts->currentIndex())
-            );
+            m_comboBoxCharts->currentData().value<ChartType>());
         if (!renderer) {
             return;
         }
