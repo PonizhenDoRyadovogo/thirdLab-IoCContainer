@@ -97,6 +97,7 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
         }
         m_currentData = reader->read(path);
         if(m_currentData.isEmpty()) {
+            _clearChart();
             QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
             _setDisableCheckBox();
             _setDisableSaveButton();
@@ -182,6 +183,18 @@ void MainWindow::_setDisableCheckBox()
         m_checkBoxBlackAndWhite->setEnabled(false);
     } else {
         return;
+    }
+}
+
+void MainWindow::_clearChart()
+{
+    if (auto *chart = m_chartView->chart()) {
+        chart->removeAllSeries();
+        const auto axes = chart->axes();
+        for (auto *axis : axes) {
+            chart->removeAxis(axis);
+        }
+        chart->setTitle({});
     }
 }
 
