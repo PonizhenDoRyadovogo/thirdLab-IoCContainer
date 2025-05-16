@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
     qRegisterMetaType<ChartType>("ChartType");
     injector.RegisterFactory<JsonReader, JsonReader>();
     injector.RegisterFactory<SqlReader, SqlReader>();
-
     injector.RegisterFactory<PieChartRender, PieChartRender>();
     injector.RegisterFactory<BarChartRender, BarChartRender>();
+
     injector.RegisterFunctor<ReaderFactory, JsonReader, SqlReader>(
         std::function<std::shared_ptr<ReaderFactory>(
             std::shared_ptr<JsonReader>,

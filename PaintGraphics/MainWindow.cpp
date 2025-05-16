@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QSplitter>
 #include <QVariant>
+#include <QMessageBox>
 
 #include "MainWindow.h"
 
@@ -12,6 +13,7 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     , m_chartFactory(std::move(chart))
 {
     setWindowTitle("Charts print");
+    // создаем комбо-боксы
     m_comboBoxCharts = _createComboBoxCharts();
     m_comboBoxWindowStyle = _createComboBoxStyle();
     // Создание центрального виджета
@@ -21,7 +23,9 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     QLabel* labelStyleWin = new QLabel("Change the theme:", central);
     // Инициализация кнопки печати и чекбокса для черно-белого графика
     m_pushButtonSave = new QPushButton("Save chart", central);
+    m_pushButtonSave->setEnabled(false);
     m_checkBoxBlackAndWhite = new QCheckBox("Black and white", central);
+    m_checkBoxBlackAndWhite->setEnabled(false);
     // Инициализация кнопки для открытия папки
     m_pushButtonFolder = new QPushButton("Open folder", central);
     // Создание лэйаутов для компоновки настроек
@@ -61,8 +65,9 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     m_fileExplorer = new QFileSystemModel(this);
     m_fileExplorer->setFilter(QDir::Files | QDir::NoDotAndDotDot);// показываем только файлы, но скрываем специальные . ..
     m_fileExplorer->setRootPath(QDir::homePath());
-    m_listView->setRootIndex(m_fileExplorer->index(QDir::homePath()));
     m_listView->setModel(m_fileExplorer);
+    m_listView->setRootIndex(m_fileExplorer->index(QDir::homePath()));
+    statusBar()->showMessage("Current dir: " + QDir::homePath());
     m_listView->setSelectionMode(QAbstractItemView::SingleSelection);
     // выставляем фильтры для файлов
     QStringList filters;
@@ -80,6 +85,7 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
         }
         m_fileExplorer->setRootPath(dir);
         m_listView->setRootIndex(m_fileExplorer->index(dir));
+        statusBar()->showMessage("Current dir: " + dir);
     });
     // сигнал выбора элемента в списке
     connect(m_listView, &QListView::clicked, this, [&](const QModelIndex &ix){
@@ -90,12 +96,23 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
             return;
         }
         m_currentData = reader->read(path);
+        if(m_currentData.isEmpty()) {
+            QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
+            _setDisableCheckBox();
+            _setDisableSaveButton();
+            return;
+        }
         auto renderer = m_chartFactory->getRender(
             m_comboBoxCharts->currentData().value<ChartType>());
         if (!renderer) {
+            QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
+            _setDisableCheckBox();
+            _setDisableSaveButton();
             return;
         }
         renderer->render(m_currentData, m_chartView);
+        _setEnableCheckBox();
+        _setEnableSaveButton();
     });
     // сигнал изменения чарта
     connect(m_comboBoxCharts, &QComboBox::currentTextChanged, this, [this](){
@@ -130,6 +147,42 @@ QComboBox* MainWindow::_createComboBoxStyle() const
     comboBox->addItem("Light");
     comboBox->addItem("Dark");
     return comboBox;
+}
+
+void MainWindow::_setEnableSaveButton()
+{
+    if(!m_pushButtonSave->isEnabled()) {
+        m_pushButtonSave->setEnabled(true);
+    } else {
+        return;
+    }
+}
+
+void MainWindow::_setEnableCheckBox()
+{
+    if(!m_checkBoxBlackAndWhite->isEnabled()) {
+        m_checkBoxBlackAndWhite->setEnabled(true);
+    } else {
+        return;
+    }
+}
+
+void MainWindow::_setDisableSaveButton()
+{
+    if(m_pushButtonSave->isEnabled()) {
+        m_pushButtonSave->setEnabled(false);
+    } else {
+        return;
+    }
+}
+
+void MainWindow::_setDisableCheckBox()
+{
+    if(m_checkBoxBlackAndWhite->isEnabled()) {
+        m_checkBoxBlackAndWhite->setEnabled(false);
+    } else {
+        return;
+    }
 }
 
 MainWindow::~MainWindow()

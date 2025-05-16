@@ -23,6 +23,10 @@ public:
 private:
     QComboBox* _createComboBoxCharts() const;
     QComboBox* _createComboBoxStyle() const;
+    void _setEnableSaveButton();
+    void _setEnableCheckBox();
+    void _setDisableSaveButton();
+    void _setDisableCheckBox();
 private:
     QComboBox* m_comboBoxCharts = nullptr;
     QPushButton* m_pushButtonSave = nullptr;

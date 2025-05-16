@@ -3,10 +3,13 @@
 
 #include <QVector>
 #include <QPair>
-#include <QString>
+#include <QDateTime>
 
 struct DataModel {
-    QVector<QPair<QString, double>> points;
+    QVector<QPair<QDateTime, double>> points;
+    bool isEmpty() const {
+        return points.empty();
+    }
 };
 
 #endif // DATAMODEL_H
