@@ -1,5 +1,15 @@
 #include "IDataReader.h"
 
+const QVector<QString> IDataReader::FORMAT_DATE = {"dd.MM.yyyy HH:mm"
+    , "dd.MM.yyyy"
+    , "yyyy.MM.dd HH:mm"
+    , "yyyy.MM.dd"
+    , "dd-MM-yyyy HH:mm"
+    , "dd-MM-yyy"
+    , "yyyy-MM-dd HH:mm"
+    , "yyyy-MM-dd"
+};
+
 QDateTime IDataReader::parseDate(const QString& raw) const
 {
     const auto parts = raw.split(' ', Qt::SkipEmptyParts);
@@ -10,17 +20,21 @@ QDateTime IDataReader::parseDate(const QString& raw) const
     const QString datePart = parts[0];
     const QString time = parts[1];
 
-    QDateTime dt = QDateTime::fromString(raw, "dd.MM.yyyy HH:mm");
-    if(dt.isValid()) {
-        return dt;
+    for(const auto& format: FORMAT_DATE) {
+        QDateTime dt = QDateTime::fromString(raw, format);
+        if(dt.isValid()) {
+            return dt;
+        }
     }
 
     bool ok = false;
     int mins = time.toInt(&ok);
     if(ok) {
-        QDate d = QDate::fromString(datePart, "dd.MM.yyyy");
-        if(d.isValid()) {
-            return d.startOfDay().addSecs(mins * 60);
+        for(const auto& format: FORMAT_DATE) {
+            QDate d = QDate::fromString(datePart, format);
+            if(d.isValid()) {
+                return d.startOfDay().addSecs(mins * 60);
+            }
         }
     }
 

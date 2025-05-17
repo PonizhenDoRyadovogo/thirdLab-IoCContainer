@@ -10,6 +10,8 @@ public:
     virtual DataModel read(const QString& path) = 0;
     virtual QString get() const = 0;
     virtual QDateTime parseDate(const QString& raw) const;
+private:
+    static const QVector<QString> FORMAT_DATE;
 };
 
 #endif // IDATAREADER_H
