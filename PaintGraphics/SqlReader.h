@@ -8,6 +8,7 @@ class SqlReader : public IDataReader
 public:
     DataModel read(const QString& path) override;
     QString get() const override;
+
 };
 
 #endif // SQLREADER_H

@@ -7,7 +7,7 @@
 
 enum ChartType {
     PieChart,
-    BarChart
+    LineChart
 };
 
 Q_DECLARE_METATYPE(ChartType)

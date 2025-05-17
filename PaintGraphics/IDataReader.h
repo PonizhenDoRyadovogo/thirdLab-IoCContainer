@@ -9,6 +9,7 @@ public:
     virtual ~IDataReader() = default;
     virtual DataModel read(const QString& path) = 0;
     virtual QString get() const = 0;
+    virtual QDateTime parseDate(const QString& raw) const;
 };
 
 #endif // IDATAREADER_H
