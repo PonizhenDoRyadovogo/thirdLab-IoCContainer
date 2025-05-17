@@ -2,7 +2,7 @@
 #include "IocContainer.h"
 #include "JsonReader.h"
 #include "SqlReader.h"
-#include "PieChartRender.h"
+#include "ScatterChartRender.h"
 #include "LineChartRender.h"
 #include "ChartFactory.h"
 
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<ChartType>("ChartType");
     injector.RegisterFactory<JsonReader, JsonReader>();
     injector.RegisterFactory<SqlReader, SqlReader>();
-    injector.RegisterFactory<PieChartRender, PieChartRender>();
+    injector.RegisterFactory<ScatterChartRender, ScatterChartRender>();
     injector.RegisterFactory<LineChartRender, LineChartRender>();
 
     injector.RegisterFunctor<ReaderFactory, JsonReader, SqlReader>(
@@ -35,12 +35,12 @@ int main(int argc, char *argv[])
             }
             )
         );
-    injector.RegisterFunctor<ChartFactory, PieChartRender, LineChartRender>(
+    injector.RegisterFunctor<ChartFactory, ScatterChartRender, LineChartRender>(
         std::function<std::shared_ptr<ChartFactory>(
-            std::shared_ptr<PieChartRender>,
+            std::shared_ptr<ScatterChartRender>,
             std::shared_ptr<LineChartRender>
             )>(
-            [](std::shared_ptr<PieChartRender> pie, std::shared_ptr<LineChartRender> bar)
+            [](std::shared_ptr<ScatterChartRender> pie, std::shared_ptr<LineChartRender> bar)
             {
                 QVector<std::shared_ptr<IChartRender>> renderers;
                 renderers.append(pie);

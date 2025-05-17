@@ -18,9 +18,7 @@ void LineChartRender::render(const DataModel& data, QtCharts::QChartView* view)
         for (const auto &pair : data.points) {
             minY = qMin(minY, pair.second);
             maxY = qMax(maxY, pair.second);
-            const qreal x = pair.first.toMSecsSinceEpoch();
-            const qreal y = pair.second;
-            series->append(x, y);
+            series->append(pair.first.toMSecsSinceEpoch(), pair.second);
         }
     }
 

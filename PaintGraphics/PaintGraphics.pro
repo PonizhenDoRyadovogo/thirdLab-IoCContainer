@@ -13,7 +13,7 @@ SOURCES += \
     IDataReader.cpp \
     JsonReader.cpp \
     LineChartRender.cpp \
-    PieChartRender.cpp \
+    ScatterChartRender.cpp \
     SqlReader.cpp \
     main.cpp \
     MainWindow.cpp
@@ -27,8 +27,8 @@ HEADERS += \
     JsonReader.h \
     LineChartRender.h \
     MainWindow.h \
-    PieChartRender.h \
     ReaderFactory.h \
+    ScatterChartRender.h \
     SqlReader.h
 
 # Default rules for deployment.

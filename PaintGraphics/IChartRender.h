@@ -6,7 +6,7 @@
 #include "DataModel.h"
 
 enum ChartType {
-    PieChart,
+    ScatterChart,
     LineChart
 };
 
