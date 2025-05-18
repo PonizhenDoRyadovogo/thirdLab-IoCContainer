@@ -79,7 +79,14 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     // сигналы
     // сигнал открытия папки по нажатию на кнопку "Open folder"
     connect(m_pushButtonFolder, &QPushButton::clicked, this, [this](){
-        QString dir = QFileDialog::getExistingDirectory(this,"Choose folder");
+        QFileDialog dlg(this, tr("Choose folder"));
+        dlg.setFileMode(QFileDialog::Directory);
+        dlg.setOption(QFileDialog::ShowDirsOnly, false);
+        dlg.setOption(QFileDialog::DontUseNativeDialog); // используется qt-ная реализация окна, а не windows
+        if (dlg.exec() != QDialog::Accepted) {
+            return;
+        }
+        const QString dir = dlg.selectedFiles().first();
         if (dir.isEmpty()) {
             return;
         }
@@ -135,8 +142,9 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
             _onBlackWhiteStyle();
         }
     });
+    // сигнал по включению черно-белого стиля графика
     connect(m_checkBoxBlackAndWhite, &QCheckBox::toggled, this, [this](bool on){
-        if (auto *chart = m_chartView->chart()) {
+        if (m_chartView->chart()) {
             if (on) {
                 _onBlackWhiteStyle();
             } else {
