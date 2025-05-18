@@ -20,6 +20,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<ReaderFactory> reader, QWidget *parent = nullptr);
     ~MainWindow();
+protected:
+    void resizeEvent(QResizeEvent* event) override;
 private:
     QComboBox* _createComboBoxCharts() const;
     void _setEnableSaveButton();

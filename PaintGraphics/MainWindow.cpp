@@ -121,7 +121,7 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     });
     // сигнал изменения чарта
     connect(m_comboBoxCharts, &QComboBox::currentTextChanged, this, [this](){
-        if (m_currentData.points.isEmpty()) {
+        if (m_currentData.isEmpty()) {
             return;
         }
         QVariant v = m_comboBoxCharts->currentData();
@@ -158,6 +158,25 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
             m_chartView->render(&painter); // Рисование диаграммы в pdf
         }
     });
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    if (m_currentData.isEmpty()) {
+        return;
+    }
+    QVariant v = m_comboBoxCharts->currentData();
+    ChartType type = v.value<ChartType>();
+    auto renderer = m_chartFactory->getRender(type);
+    if (!renderer) {
+        return;
+    }
+    // перерисовываем график
+    renderer->render(m_currentData, m_chartView);
+    if(m_checkBoxBlackAndWhite->isChecked()) {
+        _onBlackWhiteStyle();
+    }
 }
 
 QComboBox* MainWindow::_createComboBoxCharts() const
