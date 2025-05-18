@@ -9,6 +9,7 @@
 #include <QListView>
 #include <QtCharts>
 #include <memory>
+#include <QModelIndex>
 
 #include "ChartFactory.h"
 #include "ReaderFactory.h"
@@ -20,6 +21,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<ReaderFactory> reader, QWidget *parent = nullptr);
     ~MainWindow();
+private slots:
+    void onOpenFolderClicked();
+    void onFileSelected(const QModelIndex& ix);
+    void onChartTypeChanged();
+    void onBlackWhiteToggled(bool checked);
+    void onSaveButtonClicked();
 protected:
     void resizeEvent(QResizeEvent* event) override;
 private:
