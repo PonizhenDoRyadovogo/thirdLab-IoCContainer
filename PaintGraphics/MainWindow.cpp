@@ -79,14 +79,15 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     // сигналы
     // сигнал открытия папки по нажатию на кнопку "Open folder"
     connect(m_pushButtonFolder, &QPushButton::clicked, this, [this](){
-        QFileDialog dlg(this, tr("Choose folder"));
+        QFileDialog dlg(this, "Choose folder");
         dlg.setFileMode(QFileDialog::Directory);
         dlg.setOption(QFileDialog::ShowDirsOnly, false);
         dlg.setOption(QFileDialog::DontUseNativeDialog); // используется qt-ная реализация окна, а не windows
         if (dlg.exec() != QDialog::Accepted) {
             return;
         }
-        const QString dir = dlg.selectedFiles().first();
+        const QStringList files = dlg.selectedFiles();
+        const QString dir = files.first();
         if (dir.isEmpty()) {
             return;
         }
@@ -153,6 +154,15 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
                 auto renderer = m_chartFactory->getRender(type);
                 renderer->render(m_currentData, m_chartView);
             }
+        }
+    });
+    connect(m_pushButtonSave, &QPushButton::clicked, this, [this](){
+        QString filePath = QFileDialog::getSaveFileName(this, "Save to...", "", "PDF (*.pdf)");
+        if (!filePath.isEmpty())
+        {
+            QPdfWriter pdfWriter(filePath); // Создание средства записи PDF
+            QPainter painter(&pdfWriter); // Создание объекта для рисования
+            m_chartView->render(&painter); // Рисование диаграммы в pdf
         }
     });
 }
