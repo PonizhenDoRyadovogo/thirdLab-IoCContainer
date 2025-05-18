@@ -112,6 +112,9 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
             return;
         }
         renderer->render(m_currentData, m_chartView);
+        // запоминаем стиль (черно-белый или цветной)
+        if (auto *chart = m_chartView->chart())
+            m_originalTheme = chart->theme();
         _setEnableCheckBox();
         _setEnableSaveButton();
     });
@@ -128,8 +131,23 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
         }
         // перерисовываем график
         renderer->render(m_currentData, m_chartView);
+        // запоминаем стиль (черно-белый или цветной)
+        if (auto *chart = m_chartView->chart()) {
+            m_originalTheme = chart->theme();
+        }
     });
-
+    connect(m_checkBoxBlackAndWhite, &QCheckBox::toggled, this, [this](bool on){
+        if (auto *chart = m_chartView->chart()) {
+            if (on) {
+                chart->setTheme(QtCharts::QChart::ChartThemeHighContrast);
+            } else {
+                // перерисовываем с нуля
+                ChartType type = m_comboBoxCharts->currentData().value<ChartType>();
+                auto renderer = m_chartFactory->getRender(type);
+                renderer->render(m_currentData, m_chartView);
+            }
+        }
+    });
 }
 
 QComboBox* MainWindow::_createComboBoxCharts() const
