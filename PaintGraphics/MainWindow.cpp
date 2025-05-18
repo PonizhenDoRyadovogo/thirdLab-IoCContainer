@@ -13,14 +13,13 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     , m_chartFactory(std::move(chart))
 {
     setWindowTitle("Charts print");
+    setMinimumSize(800, 600);
     // создаем комбо-боксы
     m_comboBoxCharts = _createComboBoxCharts();
-    m_comboBoxWindowStyle = _createComboBoxStyle();
     // Создание центрального виджета
     QWidget* central = new QWidget(this);
     // Создание подписей
     QLabel* labelCharts = new QLabel("Choose charts:", central);
-    QLabel* labelStyleWin = new QLabel("Change the theme:", central);
     // Инициализация кнопки печати и чекбокса для черно-белого графика
     m_pushButtonSave = new QPushButton("Save chart", central);
     m_pushButtonSave->setEnabled(false);
@@ -32,17 +31,11 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     QHBoxLayout* settingsLayout = new QHBoxLayout();
     QHBoxLayout* chartsLayout = new QHBoxLayout(); // эти два лэйаута необходимы для того, чтобы
     // надписи "прилипали" к своим комбо-боксам
-    QHBoxLayout* styleLayout = new QHBoxLayout();
-    styleLayout->setContentsMargins(0,0,0,0);
-    styleLayout->setSpacing(5);
     chartsLayout->setSpacing(5);
     chartsLayout->setContentsMargins(0, 0, 0, 0);
     settingsLayout->addWidget(m_pushButtonFolder);
     chartsLayout->addWidget(labelCharts, 0);
     chartsLayout->addWidget(m_comboBoxCharts, 1);
-    styleLayout->addWidget(labelStyleWin, 0);
-    styleLayout->addWidget(m_comboBoxWindowStyle, 1);
-    settingsLayout->addLayout(styleLayout);
     settingsLayout->addLayout(chartsLayout);
     settingsLayout->addWidget(m_checkBoxBlackAndWhite);
     settingsLayout->addWidget(m_pushButtonSave);
@@ -174,14 +167,6 @@ QComboBox* MainWindow::_createComboBoxCharts() const
     for(auto& r: renderers) {
         comboBox->addItem(r->getNameChart(), QVariant::fromValue(r->getType()));
     }
-    return comboBox;
-}
-
-QComboBox* MainWindow::_createComboBoxStyle() const
-{
-    QComboBox* comboBox = new QComboBox();
-    comboBox->addItem("Light");
-    comboBox->addItem("Dark");
     return comboBox;
 }
 

@@ -30,7 +30,11 @@ void LineChartRender::render(const DataModel& data, QtCharts::QChartView* view)
     QtCharts::QDateTimeAxis* axisX = new QtCharts::QDateTimeAxis();
     axisX->setFormat("dd.MM.yyyy HH:mm");
     axisX->setLabelsAngle(-45);
-    axisX->setTickCount(15);
+    // высчитаем количество меток
+    int pixelsPerTick = 100;
+    int w = view->size().width();
+    int count = qMax(2, w / pixelsPerTick);
+    axisX->setTickCount(count);
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
     axisX->setRange(data.points.first().first, data.points.last().first);
