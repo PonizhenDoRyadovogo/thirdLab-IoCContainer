@@ -71,93 +71,108 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     m_fileExplorer->setNameFilterDisables(false);
     // сигналы
     // сигнал открытия папки по нажатию на кнопку "Open folder"
-    connect(m_pushButtonFolder, &QPushButton::clicked, this, [this](){
-        QFileDialog dlg(this, "Choose folder");
-        dlg.setFileMode(QFileDialog::Directory);
-        dlg.setOption(QFileDialog::ShowDirsOnly, false);
-        dlg.setOption(QFileDialog::DontUseNativeDialog); // используется qt-ная реализация окна, а не windows
-        if (dlg.exec() != QDialog::Accepted) {
-            return;
-        }
-        const QStringList files = dlg.selectedFiles();
-        const QString dir = files.first();
-        if (dir.isEmpty()) {
-            return;
-        }
-        m_fileExplorer->setRootPath(dir);
-        m_listView->setRootIndex(m_fileExplorer->index(dir));
-        statusBar()->showMessage("Current dir: " + dir);
-    });
+    connect(m_pushButtonFolder, &QPushButton::clicked, this, &MainWindow::onOpenFolderClicked);
     // сигнал выбора элемента в списке
-    connect(m_listView, &QListView::clicked, this, [&](const QModelIndex &ix){
-        QString path = m_fileExplorer->filePath(ix);
-        QString ext  = QFileInfo(path).suffix();
-        auto reader = m_readerFactory->getReader(ext);
-        if (!reader) {
-            return;
-        }
-        m_currentData = reader->read(path);
-        if(m_currentData.isEmpty()) {
-            _clearChart();
-            QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
-            _setDisableCheckBox();
-            _setDisableSaveButton();
-            return;
-        }
-        auto renderer = m_chartFactory->getRender(
-            m_comboBoxCharts->currentData().value<ChartType>());
-        if (!renderer) {
-            QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
-            _setDisableCheckBox();
-            _setDisableSaveButton();
-            return;
-        }
-        renderer->render(m_currentData, m_chartView);
-        if(m_checkBoxBlackAndWhite->isChecked()) {
-            _onBlackWhiteStyle();
-        }
-        _setEnableCheckBox();
-        _setEnableSaveButton();
-    });
+    connect(m_listView, &QListView::clicked, this, &MainWindow::onFileSelected);
     // сигнал изменения чарта
-    connect(m_comboBoxCharts, &QComboBox::currentTextChanged, this, [this](){
-        if (m_currentData.isEmpty()) {
-            return;
-        }
-        QVariant v = m_comboBoxCharts->currentData();
-        ChartType type = v.value<ChartType>();
-        auto renderer = m_chartFactory->getRender(type);
-        if (!renderer) {
-            return;
-        }
-        // перерисовываем график
-        renderer->render(m_currentData, m_chartView);
-        if(m_checkBoxBlackAndWhite->isChecked()) {
-            _onBlackWhiteStyle();
-        }
-    });
+    connect(m_comboBoxCharts, &QComboBox::currentTextChanged, this, &MainWindow::onChartTypeChanged);
     // сигнал по включению черно-белого стиля графика
-    connect(m_checkBoxBlackAndWhite, &QCheckBox::toggled, this, [this](bool on){
-        if (m_chartView->chart()) {
-            if (on) {
-                _onBlackWhiteStyle();
-            } else {
-                // перерисовываем с нуля
-                ChartType type = m_comboBoxCharts->currentData().value<ChartType>();
-                auto renderer = m_chartFactory->getRender(type);
-                renderer->render(m_currentData, m_chartView);
-            }
+    connect(m_checkBoxBlackAndWhite, &QCheckBox::toggled, this, &MainWindow::onBlackWhiteToggled);
+    connect(m_pushButtonSave, &QPushButton::clicked, this, &MainWindow::onSaveButtonClicked);
+}
+
+void MainWindow::onOpenFolderClicked()
+{
+    QFileDialog dlg(this, "Choose folder");
+    dlg.setFileMode(QFileDialog::Directory);
+    dlg.setOption(QFileDialog::ShowDirsOnly, false);
+    dlg.setOption(QFileDialog::DontUseNativeDialog); // используется qt-ная реализация окна, а не windows
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+    const QStringList files = dlg.selectedFiles();
+    const QString dir = files.first();
+    if (dir.isEmpty()) {
+        return;
+    }
+    m_fileExplorer->setRootPath(dir);
+    m_listView->setRootIndex(m_fileExplorer->index(dir));
+    statusBar()->showMessage("Current dir: " + dir);
+}
+
+void MainWindow::onFileSelected(const QModelIndex& ix)
+{
+    QString path = m_fileExplorer->filePath(ix);
+    QString ext  = QFileInfo(path).suffix();
+    auto reader = m_readerFactory->getReader(ext);
+    if (!reader) {
+        return;
+    }
+    m_currentData = reader->read(path);
+    if(m_currentData.isEmpty()) {
+        _clearChart();
+        QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
+        _setDisableCheckBox();
+        _setDisableSaveButton();
+        return;
+    }
+    auto renderer = m_chartFactory->getRender(
+        m_comboBoxCharts->currentData().value<ChartType>());
+    if (!renderer) {
+        QMessageBox::warning(this, "Error", "Ooops... Something went wrong. Try again!");
+        _setDisableCheckBox();
+        _setDisableSaveButton();
+        return;
+    }
+    renderer->render(m_currentData, m_chartView);
+    if(m_checkBoxBlackAndWhite->isChecked()) {
+        _onBlackWhiteStyle();
+    }
+    _setEnableCheckBox();
+    _setEnableSaveButton();
+}
+
+void MainWindow::onChartTypeChanged()
+{
+    if (m_currentData.isEmpty()) {
+        return;
+    }
+    QVariant v = m_comboBoxCharts->currentData();
+    ChartType type = v.value<ChartType>();
+    auto renderer = m_chartFactory->getRender(type);
+    if (!renderer) {
+        return;
+    }
+    // перерисовываем график
+    renderer->render(m_currentData, m_chartView);
+    if(m_checkBoxBlackAndWhite->isChecked()) {
+        _onBlackWhiteStyle();
+    }
+}
+
+void MainWindow::onBlackWhiteToggled(bool checked)
+{
+    if (m_chartView->chart()) {
+        if (checked) {
+            _onBlackWhiteStyle();
+        } else {
+            // перерисовываем с нуля
+            ChartType type = m_comboBoxCharts->currentData().value<ChartType>();
+            auto renderer = m_chartFactory->getRender(type);
+            renderer->render(m_currentData, m_chartView);
         }
-    });
-    connect(m_pushButtonSave, &QPushButton::clicked, this, [this](){
-        QString filePath = QFileDialog::getSaveFileName(this, "Save to...", "", "PDF (*.pdf)");
-        if (!filePath.isEmpty())
-        {
-            QPdfWriter pdfWriter(filePath); // Создание средства записи PDF
-            QPainter painter(&pdfWriter); // Создание объекта для рисования
-            m_chartView->render(&painter); // Рисование диаграммы в pdf
-        }
-    });
+    }
+}
+
+void MainWindow::onSaveButtonClicked()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "Save to...", "", "PDF (*.pdf)");
+    if (!filePath.isEmpty())
+    {
+        QPdfWriter pdfWriter(filePath); // Создание средства записи PDF
+        QPainter painter(&pdfWriter); // Создание объекта для рисования
+        m_chartView->render(&painter); // Рисование диаграммы в pdf
+    }
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)
