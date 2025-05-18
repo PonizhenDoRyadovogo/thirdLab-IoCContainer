@@ -28,6 +28,7 @@ private:
     void _setDisableSaveButton();
     void _setDisableCheckBox();
     void _clearChart();
+    void _onBlackWhiteStyle();
 private:
     QComboBox* m_comboBoxCharts = nullptr;
     QPushButton* m_pushButtonSave = nullptr;

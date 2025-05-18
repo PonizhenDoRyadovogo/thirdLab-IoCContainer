@@ -112,9 +112,9 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
             return;
         }
         renderer->render(m_currentData, m_chartView);
-        // запоминаем стиль (черно-белый или цветной)
-        if (auto *chart = m_chartView->chart())
-            m_originalTheme = chart->theme();
+        if(m_checkBoxBlackAndWhite->isChecked()) {
+            _onBlackWhiteStyle();
+        }
         _setEnableCheckBox();
         _setEnableSaveButton();
     });
@@ -131,15 +131,14 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
         }
         // перерисовываем график
         renderer->render(m_currentData, m_chartView);
-        // запоминаем стиль (черно-белый или цветной)
-        if (auto *chart = m_chartView->chart()) {
-            m_originalTheme = chart->theme();
+        if(m_checkBoxBlackAndWhite->isChecked()) {
+            _onBlackWhiteStyle();
         }
     });
     connect(m_checkBoxBlackAndWhite, &QCheckBox::toggled, this, [this](bool on){
         if (auto *chart = m_chartView->chart()) {
             if (on) {
-                chart->setTheme(QtCharts::QChart::ChartThemeHighContrast);
+                _onBlackWhiteStyle();
             } else {
                 // перерисовываем с нуля
                 ChartType type = m_comboBoxCharts->currentData().value<ChartType>();
@@ -213,6 +212,17 @@ void MainWindow::_clearChart()
             chart->removeAxis(axis);
         }
         chart->setTitle({});
+    }
+}
+
+void MainWindow::_onBlackWhiteStyle()
+{
+    m_chartView->chart()->setTheme(QtCharts::QChart::ChartThemeHighContrast);
+    if (auto *axisX = m_chartView->chart()->axes(Qt::Horizontal).value(0)) {
+        axisX->setShadesVisible(false);
+    }
+    if (auto *axisY = m_chartView->chart()->axes(Qt::Vertical).value(0)) {
+        axisY->setShadesVisible(false);
     }
 }
 
