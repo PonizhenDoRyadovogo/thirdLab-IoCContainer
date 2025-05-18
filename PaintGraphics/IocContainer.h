@@ -4,6 +4,9 @@
 #include <memory>
 #include <map>
 
+#include "ChartFactory.h"
+#include "ReaderFactory.h"
+
 class IOCContainer
 {
     static int s_nextTypeId;
@@ -88,6 +91,38 @@ public:
     template<typename TInterface, typename TConcrete, typename... TArguments>
     void RegisterInstance() {
         RegisterInstance<TInterface>(std::make_shared<TConcrete>(GetObject<TArguments>()...));
+    }
+
+    template<typename... ReaderTs>
+    void RegisterReaders() {
+        // Зарегистрировать каждого Reader-а как сам на себя
+        ( RegisterFactory<ReaderTs, ReaderTs>(), ... );
+
+        // Зарегистрировать фабрику по указателю на статическую функцию
+        RegisterFunctor<ReaderFactory, ReaderTs...>(
+            &IOCContainer::CreateReaderFactoryFn<ReaderTs...>
+            );
+    }
+
+    template<typename... RenderTs>
+    void RegisterCharts() {
+        ( RegisterFactory<RenderTs, RenderTs>(), ... );
+
+        RegisterFunctor<ChartFactory, RenderTs...>(
+            &IOCContainer::CreateChartFactoryFn<RenderTs...>
+            );
+    }
+private:
+    template<typename... ReaderTs>
+    static std::shared_ptr<ReaderFactory> CreateReaderFactoryFn(std::shared_ptr<ReaderTs>... readers) {
+        QVector<std::shared_ptr<IDataReader>> v{ readers... };
+        return std::make_shared<ReaderFactory>(v);
+    }
+
+    template<typename... RenderTs>
+    static std::shared_ptr<ChartFactory> CreateChartFactoryFn(std::shared_ptr<RenderTs>... renders) {
+        QVector<std::shared_ptr<IChartRender>> v{ renders... };
+        return std::make_shared<ChartFactory>(v);
     }
 };
 #endif // IOCCONTAINER_H

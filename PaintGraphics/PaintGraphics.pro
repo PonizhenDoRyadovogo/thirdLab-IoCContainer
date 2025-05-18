@@ -19,6 +19,7 @@ SOURCES += \
     MainWindow.cpp
 
 HEADERS += \
+    AppConfigurartor.h \
     ChartFactory.h \
     DataModel.h \
     IChartRender.h \
