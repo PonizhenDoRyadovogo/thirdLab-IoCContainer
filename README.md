@@ -54,7 +54,8 @@ template<typename... ReaderTs>
     }
 ```
 ## UML-диаграмма
-![chartPrinting](https://github.com/user-attachments/assets/f69c7696-6154-4a92-afce-54b4f97ab60d)
+![chartPrinting2](https://github.com/user-attachments/assets/03e89f04-f20a-4ae1-978f-1286532c035c)
+
 ## Инструкция по расширению функционала
 1. **Новый ридер**: наследоваться от `IDataReader`, реализовать `read()` + `supportedExtensions()`, добавить в `AppConfigurator`:
    ``` c++
