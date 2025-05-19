@@ -40,8 +40,8 @@ MainWindow::MainWindow(std::shared_ptr<ChartFactory> chart, std::shared_ptr<Read
     settingsLayout->addWidget(m_checkBoxBlackAndWhite);
     settingsLayout->addWidget(m_pushButtonSave);
     // Создание области отображения файлов и области отображения графиков, между ними сплиттер
-    m_listView = new QListView();
-    m_chartView = new QtCharts::QChartView();
+    m_listView = new QListView(this);
+    m_chartView = new QtCharts::QChartView(this);
     QSplitter* splitter = new QSplitter(central);
     splitter->addWidget(m_listView);
     splitter->addWidget(m_chartView);
